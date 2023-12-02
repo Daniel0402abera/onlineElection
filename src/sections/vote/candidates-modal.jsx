@@ -1,47 +1,61 @@
 import * as React from 'react';
 
 import Box from '@mui/material/Box';
-import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
-import { Container } from '@mui/material';
-import Typography from '@mui/material/Typography';
+import Dialog from '@mui/material/Dialog';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+import { Container, Typography } from '@mui/material';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import OutlinedInput from '@mui/material/OutlinedInput';
 
-import PositionList from './position-list';
-import CandidateList from './candidates-list';
+import { useGet } from 'src/service/useGet';
+import { usePost } from 'src/service/usePost';
 
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: '50%',
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
-
-export default function CandidateModal() {
+export default function DialogSelect() {
   const [open, setOpen] = React.useState(false);
-  const [selectedPosition, setSelectedPosition] = React.useState(null);
-  const [selectedCandidate, setSelectedCandidate] = React.useState(null);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
 
-  const handlePositionSelect = (selectedValue) => {
-    setSelectedPosition(selectedValue);
-    console.log(selectedPosition)
+  const [selectedpPosition, setSelectedpPosition] = React.useState('');
+  const [selectedpCandidate, setSelectedpCandidate] = React.useState('');
+
+  const { data: fetchedUser, isFetching: isLoadingUser } = useGet('/api/v1/users');
+  const { data: fetchedPositions, isFetching: isLoadingPositions } = useGet('/api/v1/positions');
+
+  const handleChange = (event) => {
+    setSelectedpPosition(Number(event.target.value) || '');
+  };
+  const handleChangeCandidate = (event) => {
+    setSelectedpCandidate(Number(event.target.value) || '');
   };
 
-  const handleCandidateSelect = (selectedValue) => {
-    setSelectedCandidate(selectedValue);
-    console.log(selectedCandidate)
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason !== 'backdropClick') {
+      setOpen(false);
+    }
+  };
+
+  const { mutateAsync: createCandidate, isPending: isCreatingCandidate } =
+    usePost('/api/v1/candidates');
+
+  const handleCreateCandidate = async () => {
+    const transformedData = {
+      positionId: selectedpPosition,
+      userId: selectedpCandidate,
+    };
+    await createCandidate(transformedData);
   };
 
   return (
     <div>
       <Button
-        onClick={handleOpen}
+        onClick={handleClickOpen}
         variant="contained"
         style={{
           width: '10%',
@@ -53,33 +67,53 @@ export default function CandidateModal() {
       >
         Add Candidates
       </Button>
+      <Dialog disableEscapeKeyDown open={open} onClose={handleClose}>
+        <Typography align="center" style={{ marginBottom: '20px' }} variant="h6" component="h2">
+          Add New Candidates
+        </Typography>
+        <DialogContent style={{ width: 500 }}>
+          <Box component="form">
+            <FormControl style={{ marginBottom: '10px' }} fullWidth>
+              <InputLabel id="demo-dialog-select-label">position</InputLabel>
+              <Select
+                labelId="demo-dialog-select-label"
+                id="demo-dialog-select"
+                value={selectedpPosition}
+                onChange={handleChange}
+                input={<OutlinedInput label="position" />}
+              >
+                <MenuItem value="">
+                  <em>{isLoadingPositions ? 'loading...' : 'None'}</em>
+                </MenuItem>
+                {fetchedPositions?.map((position, index) => (
+                  <MenuItem value={position?.id}>{position?.name}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-        
-      >
-        <Box sx={style}>
-          <Typography align="center" style={{marginBottom:'20px'}} variant="h6" component="h2">
-            Add New Candidates
-          </Typography>
-
-          <Container style={{display:'flex'}}>
-          <Container>
-          {/* <PositionList/> */}
-          <PositionList onPositionSelect={handlePositionSelect} />
-            
-          </Container>
-          <Container>
-          {/* <CandidateList/> */}
-          <CandidateList onCandidateSelect={handleCandidateSelect} />
-          </Container>
-          
-          </Container>
-          
-          <Container style={{ display: 'flex',marginTop:'100px',justifyContent:'space-between'}}>
+            <FormControl fullWidth>
+              <InputLabel id="demo-dialog-select-label">candidate</InputLabel>
+              <Select
+                labelId="demo-dialog-select-label"
+                id="demo-dialog-select"
+                value={selectedpCandidate}
+                onChange={handleChangeCandidate}
+                input={<OutlinedInput label="candidate" />}
+              >
+                <MenuItem value="">
+                  <em>{isLoadingUser ? 'loading...' : 'None'}</em>
+                </MenuItem>
+                {fetchedUser?.map((candidate, index) => (
+                  <MenuItem value={candidate?.userId}>{candidate?.fullName}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Container
+            style={{ display: 'flex', marginTop: '100px', justifyContent: 'space-between' }}
+          >
             <Button
               onClick={handleClose}
               variant="contained"
@@ -94,7 +128,7 @@ export default function CandidateModal() {
               Cancle
             </Button>
             <Button
-              onClick={handleOpen}
+              onClick={handleCreateCandidate}
               variant="contained"
               style={{
                 width: '30%',
@@ -104,11 +138,11 @@ export default function CandidateModal() {
                 color: 'white',
               }}
             >
-              Add
+              {isCreatingCandidate ? 'ADD..' : 'ADD'}
             </Button>
           </Container>
-        </Box>
-      </Modal>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }

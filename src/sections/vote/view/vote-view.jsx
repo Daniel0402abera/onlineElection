@@ -100,7 +100,7 @@ export default function VotePage() {
           <Grid container>
             {candidates?.map((candidate) => (
               <Grid
-                key={candidate.id}
+                key={candidate?.id}
                 xs={12}
                 style={{ display: 'flex', marginLeft: '20px' }}
                 sm={6}

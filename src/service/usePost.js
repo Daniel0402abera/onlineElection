@@ -32,7 +32,7 @@ export function usePost(endpoint) {
           });
           return response.data;
         }
-        console.log(response.json())
+       
         if (response.status === 201) {
           toast.success(`Successfull Added!`, {
             position: toast.POSITION.TOP_CENTER,
@@ -47,7 +47,7 @@ export function usePost(endpoint) {
         }
         
       } catch (error) {
-        console.log(error)
+      
         toast.error(error?.response?.data?.message, {
           position: toast.POSITION.TOP_RIGHT,
         });
