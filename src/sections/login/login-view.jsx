@@ -33,8 +33,7 @@ import api from '../../service/api';
 
 export default function LoginView() {
   const theme = useTheme();
-  const { login } = useAuth();
-  const { user } = useAuth();
+  const { login, user } = useAuth();
   const router = useRouter();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -55,61 +54,52 @@ export default function LoginView() {
         if (response.status === 200) {
           const decodedToken = jwtDecode(response?.data?.access_token);
 
-          const decodedUser = async () => ({
+          const decodedUser = {
             username: decodedToken?.sub,
             role: decodedToken?.role[0],
-          });
+          };
           localStorage.setItem('role', decodedToken?.role);
           localStorage.setItem('user', decodedToken?.sub);
-          localStorage.setItem('access_token',response?.data?.access_token);
-          
-          await login({ user:JSON.stringify(decodedUser)});
+          localStorage.setItem('access_token', response?.data?.access_token);
+
+          await login({ user: JSON.stringify(decodedUser) });
 
           toast.success('Success Login !', {
             position: toast.POSITION.TOP_RIGHT,
           });
           return response.data;
         }
-        // eslint-disable-next-line no-shadow
       } catch (error) {
         if (error.response) {
           toast.error(`${error.message}`, {
             position: toast.POSITION.TOP_RIGHT,
           });
-          return '';
         }
+        return '';
       }
     },
-
-    onSuccess: (data) => {
+    onSuccess: () => {
       QueryClient.invalidateQueries('users');
     },
   });
+
   const Role = localStorage.getItem('role');
 
   useEffect(() => {
     if (user && Role === 'ADMIN') {
       router.push('/dashboard');
-    } else if(user && Role === 'USER'){
-      router.push('/dashboard/Voting_list');
+    } else if (user && Role === 'USER') {
+      router.push('/dashboard');
     }
   }, [Role, router, user]);
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
 
     loginMutation({
       username: email,
       password,
     });
-
-    if (user && Role === 'ADMIN') {
-      router.push('/dashboard');
-    } else if(user && Role === 'USER'){
-      router.push('/dashboard/Voting_list');
-    }
-
-    
   };
 
   const renderForm = (

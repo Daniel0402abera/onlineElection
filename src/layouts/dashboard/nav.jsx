@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
 import Drawer from '@mui/material/Drawer';
 import Avatar from '@mui/material/Avatar';
 import { alpha } from '@mui/material/styles';
@@ -19,7 +18,9 @@ import Scrollbar from 'src/components/scrollbar';
 
 import { NAV } from './config-layout';
 // import filterNavConfigByRole from './config-navigation';
-import navConfig from './config-navigation';
+// import navConfig from './config-navigation';
+// eslint-disable-next-line import/no-cycle
+import Navigation from './config-navigation';
 
 // ----------------------------------------------------------------------
 
@@ -73,13 +74,13 @@ export default function Nav({ openNav, onCloseNav }) {
     </Box>
   );
 
-  const renderMenu = (
-    <Stack component="nav" spacing={0.5} sx={{ px: 2 }}>
-      {navConfig?.map((item) => (
-        <NavItem key={item.title} item={item} />
-      ))}
-    </Stack>
-  );
+  // const renderMenu = (
+  //   <Stack component="nav" spacing={0.5} sx={{ px: 2 }}>
+  //     {navConfig?.map((item) => (
+  //       <NavItem key={item.title} item={item} />
+  //     ))}
+  //   </Stack>
+  // );
 
   const renderContent = (
     <Scrollbar
@@ -96,7 +97,8 @@ export default function Nav({ openNav, onCloseNav }) {
 
       {renderAccount}
 
-      {renderMenu}
+      {/* {renderMenu} */}
+      <Navigation/>
 
       <Box sx={{ flexGrow: 1 }} />
     </Scrollbar>
@@ -144,7 +146,7 @@ Nav.propTypes = {
 
 // ----------------------------------------------------------------------
 
-function NavItem({ item }) {
+ export function NavItem({ item }) {
   const pathname = usePathname();
 
   const active = item.path === pathname;

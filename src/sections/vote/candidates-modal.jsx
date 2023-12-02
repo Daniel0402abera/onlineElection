@@ -31,6 +31,7 @@ export default function DialogSelect() {
     setSelectedpCandidate(Number(event.target.value) || '');
   };
 
+
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -52,8 +53,11 @@ export default function DialogSelect() {
     await createCandidate(transformedData);
   };
 
+  const userRole = localStorage.getItem('role');
+
   return (
     <div>
+      {userRole === 'ADMIN'?
       <Button
         onClick={handleClickOpen}
         variant="contained"
@@ -66,7 +70,10 @@ export default function DialogSelect() {
         }}
       >
         Add Candidates
-      </Button>
+      </Button> 
+      :""}
+      
+
       <Dialog disableEscapeKeyDown open={open} onClose={handleClose}>
         <Typography align="center" style={{ marginBottom: '20px' }} variant="h6" component="h2">
           Add New Candidates

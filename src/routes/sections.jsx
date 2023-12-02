@@ -15,27 +15,25 @@ export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
 export default function Router() {
   const { user } = useAuth();
-
   const isAuthenticated = !!user;
   const userRole = localStorage.getItem('role');
 
-  const routes = useRoutes([
+  const allRoutes = [
     {
       path: '/',
       element: <LoginPage />,
       index: true,
     },
     {
-      element:
-        isAuthenticated && userRole === 'ADMIN' ? (
-          <DashboardLayout>
-            <Suspense>
-              <Outlet />
-            </Suspense>
-          </DashboardLayout>
-        ) : (
-          <LoginPage />
-        ),
+      element: isAuthenticated && (userRole === 'ADMIN' || userRole === 'USER') ? (
+        <DashboardLayout>
+          <Suspense>
+            <Outlet />
+          </Suspense>
+        </DashboardLayout>
+      ) : (
+        <LoginPage />
+      ),
       children: [
         { path: '/dashboard', element: <IndexPage /> },
         { path: '/dashboard/position', element: <PositionPage /> },
@@ -43,35 +41,31 @@ export default function Router() {
         { path: '/dashboard/user', element: <UserPage /> },
       ],
     },
-
     // {
-    //   path: '/Voting_Sheet',
     //   element: isAuthenticated && userRole === 'USER' ? (
-    //     <VotePage />
+    //     <DashboardLayout>
+    //       <Suspense>
+    //         <Outlet />
+    //       </Suspense>
+    //     </DashboardLayout>
     //   ) : (
-    //     <Page404 />
+    //     <Navigate to="/404" replace />
     //   ),
-    //   index: true,
+    //   children: [{ path: '/dashboard/Voting_list', element: <VotePage /> }],
     // },
-    {
-      element:
-        isAuthenticated && userRole === 'USER' ? (
-          <DashboardLayout>
-            <Suspense>
-              <Outlet />
-            </Suspense>
-          </DashboardLayout>
-        ) : (
-          <LoginPage />
-        ),
-      children: [{ path: '/dashboard/Voting_list', element: <VotePage /> }],
-    },
-
     {
       path: '404',
       element: <Page404 />,
     },
-  ]);
+  ];
+
+  // Filter routes based on user role
+  const filteredRoutes = allRoutes.filter((route) => 
+    // Include only routes without roles or with matching user roles
+     !route.roles || route.roles.includes(userRole)
+  );
+
+  const routes = useRoutes(filteredRoutes);
 
   return routes;
 }
