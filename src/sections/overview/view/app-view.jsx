@@ -1,6 +1,9 @@
+import { useState } from 'react';
+
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
+import { Select, MenuItem, Skeleton, InputLabel, FormControl, FormHelperText } from '@mui/material';
 
 import { useGet } from 'src/service/useGet';
 
@@ -11,15 +14,20 @@ import AppWidgetSummary from '../app-widget-summary';
 // ----------------------------------------------------------------------
 
 export default function AppView() {
+  const [positionId, setPositionId] = useState(1);
   const { data: user, isFetching: isFetchingUsers } = useGet('/api/v1/users');
   const { data: positions, isFetching: isFetchingPosition } = useGet('/api/v1/positions');
   const { data: candidate, isFetching: isFetchingCandidate } = useGet('/api/v1/candidates');
+  const { data: results, isFetching: isFetchingResults } = useGet(
+    `api/v1/votes/results/${positionId}`
+  );
+
   const TotalUser = user?.length;
   const TotalPosition = positions?.length;
   const TotalCandidate = candidate?.length;
 
-  const transformedData = candidate?.map((item) => ({
-    label: item.user,
+  const transformedData = results?.map((item) => ({
+    label: item.candidateName,
     value: item.voteCount,
   }));
 
@@ -99,8 +107,31 @@ export default function AppView() {
         </Grid>
 
         <Grid xs={12} md={6} lg={4}>
-          {isFetchingCandidate ? (
-            'Loading...'
+          <FormControl sx={{ m: 1, minWidth: 120 }}>
+            <InputLabel id="demo-simple-select-helper-label">Position</InputLabel>
+            <Select
+              labelId="demo-simple-select-helper-label"
+              id="demo-simple-select-helper"
+              label="Position"
+              value={positionId}
+              onChange={(event) => setPositionId(event.target.value)}
+            >
+              {positions?.map((position) => (
+                <MenuItem key={position.id} value={position.id}>
+                  {position.name}
+                </MenuItem>
+              ))}
+            </Select>
+            <FormHelperText>Select position to see latest position results</FormHelperText>
+          </FormControl>
+          {isFetchingResults ? (
+            <Skeleton variant="rounded" style={{ marginTop: '50px' }} width={700} height={300}>
+              <AppCurrentVisits
+                chart={{
+                  series: [],
+                }}
+              />
+            </Skeleton>
           ) : (
             <AppCurrentVisits
               title="Current Total Vote"
