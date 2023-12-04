@@ -9,7 +9,7 @@ import Tabs from '@mui/material/Tabs';
 import AppBar from '@mui/material/AppBar';
 import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
-import { Grid, Button, Container } from '@mui/material';
+import { Grid, Skeleton, Container } from '@mui/material';
 
 import { useGet } from 'src/service/useGet';
 
@@ -57,7 +57,7 @@ export default function VotePage() {
   const [positionId, setPositionId] = React.useState(1);
 
   const { data: positionsName, isFetching: isFetchingPosition } = useGet('/api/v1/positions');
-  const { data: candidates } = useGet(`/api/v1/candidates/position/${positionId}`);
+  const { data: candidates, isFetching } = useGet(`/api/v1/candidates/position/${positionId}`);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -79,9 +79,9 @@ export default function VotePage() {
             variant="fullWidth"
           >
             {isFetchingPosition ? (
-              <Button loading variant="plain">
+              <Skeleton style={{margin:'auto',padding:'20px'}} variant="text">
                 Loading...
-              </Button>
+              </Skeleton>
             ) : (
               ''
             )}
@@ -106,7 +106,18 @@ export default function VotePage() {
                 sm={6}
                 md={3}
               >
-                <VoteCard candidate={candidate} positionId={positionId} />
+                {isFetching ? (
+                  <Skeleton
+                    variant="rounded"
+                    style={{ marginTop: '50px' }}
+                    width={700}
+                    height={300}
+                  >
+                    <VoteCard candidate={candidate} positionId={positionId} />
+                  </Skeleton>
+                ) : (
+                  <VoteCard candidate={candidate} positionId={positionId} />
+                )}
               </Grid>
             ))}
           </Grid>
