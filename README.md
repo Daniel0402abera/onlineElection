@@ -7,7 +7,7 @@ This repository contains the frontend codebase for the Online Election Tracking 
 
 - Node.js and npm installed on your system.
 - Basic knowledge of React and Docker.
-- Access to the Store Management backend API (local or deployed).
+- Access to the OnlineElection backend API (local or deployed).
 
 ## Configuration Options:
 ## Backend Configuration:
