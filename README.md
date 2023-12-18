@@ -41,7 +41,7 @@ Once the containers are up and running, you can access the online election track
 #For admin
 - userName: john@admin.com
 - password: 123456
-#For user
 
-- userName: dani@gmail.com
-- password: 123456
+#For user
+ - userName: dani@gmail.com
+ - password: 123456
