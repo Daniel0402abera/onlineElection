@@ -41,18 +41,7 @@ export default function Router() {
         { path: '/dashboard/user', element: <UserPage /> },
       ],
     },
-    // {
-    //   element: isAuthenticated && userRole === 'USER' ? (
-    //     <DashboardLayout>
-    //       <Suspense>
-    //         <Outlet />
-    //       </Suspense>
-    //     </DashboardLayout>
-    //   ) : (
-    //     <Navigate to="/404" replace />
-    //   ),
-    //   children: [{ path: '/dashboard/Voting_list', element: <VotePage /> }],
-    // },
+
     {
       path: '404',
       element: <Page404 />,
